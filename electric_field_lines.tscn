@@ -1,0 +1,33 @@
+[gd_scene load_steps=6 format=3 uid="uid://c1v88a8qn38wv"]
+
+[ext_resource type="Script" path="res://electric_field_lines.gd" id="1_l2tnr"]
+[ext_resource type="PackedScene" uid="uid://b7w50dlugo30s" path="res://charge.tscn" id="2_asb1d"]
+[ext_resource type="Shader" path="res://electric_field_lines.gdshader" id="3_pts4k"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kcsxv"]
+shader = ExtResource("3_pts4k")
+shader_parameter/resolution = Vector2(1151, 645)
+shader_parameter/line_color = Color(0.2, 0.3, 0.5, 1)
+shader_parameter/grid_resolution = 29.1
+shader_parameter/thickness = 1.3
+shader_parameter/brightness = 1.9
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_laeyo"]
+
+[node name="main" type="Node2D"]
+script = ExtResource("1_l2tnr")
+
+[node name="charge2" parent="." instance=ExtResource("2_asb1d")]
+position = Vector2(874, 277)
+Q = -8.015
+
+[node name="charge" parent="." instance=ExtResource("2_asb1d")]
+position = Vector2(278, 291)
+Q = 0.285
+
+[node name="Grid" type="Sprite2D" parent="."]
+z_index = -180
+material = SubResource("ShaderMaterial_kcsxv")
+position = Vector2(576, 324)
+scale = Vector2(1152, 648)
+texture = SubResource("CanvasTexture_laeyo")
