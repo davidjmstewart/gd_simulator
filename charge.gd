@@ -5,6 +5,7 @@ extends Node2D
 @export var Q: float = 1.0 
 
 func _ready() -> void:
+	$ChargeLabel.text = "Q = %.2f C" % Q
 	pass # Replace with function body.
 
 

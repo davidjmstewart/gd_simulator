@@ -1,10 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://b7w50dlugo30s"]
+[gd_scene load_steps=8 format=3 uid="uid://b7w50dlugo30s"]
 
 [ext_resource type="Script" path="res://charge.gd" id="1_eomhk"]
 [ext_resource type="Texture2D" uid="uid://df0h2ofloodgq" path="res://assets/textures/charge_positive.png" id="2_8u503"]
 [ext_resource type="Texture2D" uid="uid://vcui7qu0512p" path="res://assets/textures/charge_negative.png" id="3_vvl4v"]
+[ext_resource type="FontFile" uid="uid://rp15rptrgguh" path="res://assets/fonts/computer-modern/cmunrm.ttf" id="4_fmcqk"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_3glq5"]
+
+[sub_resource type="FontVariation" id="FontVariation_yxqjx"]
+base_font = ExtResource("4_fmcqk")
+
+[sub_resource type="Theme" id="Theme_hi0tq"]
+default_font = SubResource("FontVariation_yxqjx")
+default_font_size = 40
 
 [node name="charge" type="Node2D"]
 script = ExtResource("1_eomhk")
@@ -22,3 +30,12 @@ texture = ExtResource("2_8u503")
 [node name="ChargeNegative" type="Sprite2D" parent="."]
 visible = false
 texture = ExtResource("3_vvl4v")
+
+[node name="ChargeLabel" type="Label" parent="."]
+offset_left = -188.0
+offset_top = -67.0
+offset_right = 189.0
+offset_bottom = 63.0
+theme = SubResource("Theme_hi0tq")
+horizontal_alignment = 1
+vertical_alignment = 1

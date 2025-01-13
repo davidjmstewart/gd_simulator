@@ -21,10 +21,12 @@ script = ExtResource("1_l2tnr")
 
 [node name="charge2" parent="." instance=ExtResource("2_asb1d")]
 position = Vector2(874, 277)
+scale = Vector2(0.5, 0.5)
 Q = -8.015
 
 [node name="charge" parent="." instance=ExtResource("2_asb1d")]
 position = Vector2(278, 291)
+scale = Vector2(0.5, 0.5)
 Q = 0.285
 
 [node name="Grid" type="Sprite2D" parent="."]
