@@ -3,14 +3,16 @@
 [ext_resource type="Script" path="res://visual_vector.gd" id="1_fbmb6"]
 
 [node name="VisualVector" type="Node2D"]
-position = Vector2(-50, 0)
+position = Vector2(100, 100)
+rotation = 0.785398
 script = ExtResource("1_fbmb6")
 
 [node name="VectorHead" type="Polygon2D" parent="."]
-position = Vector2(0, 1)
+position = Vector2(91.4214, 0)
 color = Color(0, 1, 0, 1)
-polygon = PackedVector2Array(0, 0, 100, 0, 50, 100)
+polygon = PackedVector2Array(0, -25, 0, 25, 50, 0)
 
 [node name="VectorLine" type="Line2D" parent="."]
-points = PackedVector2Array(1, 0, 0, 1)
+points = PackedVector2Array(0, 0, 91.4214, 0)
+width = 5.0
 default_color = Color(0, 1, 0, 1)
