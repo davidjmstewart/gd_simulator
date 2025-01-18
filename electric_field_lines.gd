@@ -10,6 +10,7 @@ var VisualVectorScene = preload("res://visual_vector.tscn")
 
 #float horizontal_lines
 var d = 0;
+var permittivity = 8.8541878188e-12 # e_0, epsilon nough, the absolute dieletric permittivity of a classical vacuum
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 
@@ -40,24 +41,36 @@ func _ready() -> void:
 
 	calculate_electro_static_forces(simulation_charges, simulation_points)
 
-func calculate_electro_static_forces(charges: Array[Node], simulation_points: Array):
-	for p in range(simulation_points.size()):
-		if p > 3 and p < 8:
-			
-			var visual_vec: VisualVector = VisualVectorScene.instantiate()
-			visual_vec.to = simulation_points[p]
-			visual_vec.from = simulation_points[p+12]
+func calculate_electro_static_forces(point_charges: Array[Node], simulation_points: Array):
 
-			add_child(visual_vec)
-	for charge in charges:
+	# Basic valdiation to make sure the Nodes are actually charges
+	for charge in point_charges:
 		if not (charge is Charge):
 			push_error("Node is not of Charge type")
-		else:
-			print('VALID TYPE GIVEN')
-	print(charges)
-	print(charges[0].Q)
+			
+	var visual_scaling_factor = 1000000 * grid_resolution;
 	
-	pass
+	for charge in point_charges:
+		charge = point_charges[1]
+		var point_charge = charge as Charge
+		for p in simulation_points:
+			var v_diff = (p - point_charge.position) as Vector2
+			var distance = v_diff.length()
+			var Q = point_charge.Q
+			
+			# Calculate the magnitude of the vector we are going to display. This is straight
+			# out of Coulomb's Law, however we also reduce the mangitude here by visual_scaling_factor
+			# otherwise the mangitude of the vectors would be enormous in some cases, and we would
+			# not be able to display them in any sensible/legible manner
+			var magnitude = (1/(4 * PI * permittivity) * Q) / (visual_scaling_factor * distance * distance)
+			
+			var from = p;
+			var to = from + magnitude * v_diff;
+			var visual_vec: VisualVector = VisualVectorScene.instantiate()
+			visual_vec.to = to
+			visual_vec.from = from
+			visual_vec.width = 25
+			add_child(visual_vec)
 
 func draw_vector(from: Vector2, to: Vector2, colour: Color) -> void:
 	draw_line(from, to, colour, 20.0)

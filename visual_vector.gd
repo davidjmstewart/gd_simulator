@@ -12,6 +12,20 @@ var VectorLine: Line2D = $VectorLine
 
 @export_range(0.1, 100, 0.1) var width: float = 50;
 
+var use_from_to: bool = true;
+
+var from_to = {
+	from: Vector2(100,100), 
+	to: Vector2(200,200)
+}: set = _set_from_to, get = _get_from_to
+
+func _set_from_to(new_from_to):
+	use_from_to = true;
+	from_to = new_from_to
+	
+func _get_from_to():
+	return from_to;
+	
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
