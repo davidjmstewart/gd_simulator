@@ -14,7 +14,7 @@ base_font = ExtResource("4_fmcqk")
 default_font = SubResource("FontVariation_yxqjx")
 default_font_size = 40
 
-[node name="charge" type="Node2D"]
+[node name="charge" type="Node2D" groups=["chage_group"]]
 script = ExtResource("1_eomhk")
 Q = 1.745
 

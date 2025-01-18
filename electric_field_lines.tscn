@@ -20,12 +20,12 @@ shader_parameter/vertical_lines_UV = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.
 script = ExtResource("1_l2tnr")
 
 [node name="charge2" parent="." instance=ExtResource("2_asb1d")]
-position = Vector2(891, 340)
+position = Vector2(925, 463)
 scale = Vector2(0.5, 0.5)
 Q = -8.015
 
 [node name="charge" parent="." instance=ExtResource("2_asb1d")]
-position = Vector2(203, 254)
+position = Vector2(230, 232)
 scale = Vector2(0.5, 0.5)
 Q = 0.285
 

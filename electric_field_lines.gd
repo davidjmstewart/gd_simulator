@@ -13,25 +13,51 @@ var d = 0;
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 
-	var step_width_x: float = 1.0/grid_resolution;
+	# This section calculates the grid for displaying in a shader
+	var step_width_x_UV: float = 1.0/grid_resolution;
 	var grid_size = $Grid.transform.get_scale();
-	var step_width_y: float = step_width_x * grid_size.x / grid_size.y;
-	
+	var step_width_y: float = step_width_x_UV * grid_size.x / grid_size.y;
 	for i in range(grid_resolution):
 		horizontal_lines[i] = i*step_width_y
-		vertical_lines[i] = i*step_width_x
-	#material.set_shader_param("horizontal_lines", horizontal_lines)
+		vertical_lines[i] = i*step_width_x_UV
+	
+	# Update the shader with our grid points to display a square grid
 	$Grid.material.set_shader_parameter("horizontal_lines_UV", horizontal_lines)
 	$Grid.material.set_shader_parameter("vertical_lines_UV", vertical_lines)
 	$Grid.material.set_shader_parameter("grid_resolution", grid_resolution)
-	$Grid.material.set_shader_parameter("resolution", grid_size)
+	$Grid.material.set_shader_parameter("resolution", grid_size)	
 	
-	var visual_vec: VisualVector = VisualVectorScene.instantiate()
-	visual_vec.from = Vector2(100,100);
-	visual_vec.to = Vector2(200,200);
+	# This section calculates all of the points at which we want to calculate
+	# electro static forces. N.B. the previous section was about creating a visual grid
+	# and it was convenient to use UV coordinates for that purpose. This section
+	# uses pixel coordinates as it is more convenient for the calculations we will be doing
+	var simulation_points = []
+	for i in range(grid_resolution):
+		for j in range(grid_resolution):
+			simulation_points.append(Vector2(vertical_lines[j] * grid_size.x, horizontal_lines[i]*grid_size.y))
 
-	add_child(visual_vec)
-	pass # Replace with function body.
+	var simulation_charges = get_tree().get_nodes_in_group("charge_group")
+
+	calculate_electro_static_forces(simulation_charges, simulation_points)
+
+func calculate_electro_static_forces(charges: Array[Node], simulation_points: Array):
+	for p in range(simulation_points.size()):
+		if p > 3 and p < 8:
+			
+			var visual_vec: VisualVector = VisualVectorScene.instantiate()
+			visual_vec.to = simulation_points[p]
+			visual_vec.from = simulation_points[p+12]
+
+			add_child(visual_vec)
+	for charge in charges:
+		if not (charge is Charge):
+			push_error("Node is not of Charge type")
+		else:
+			print('VALID TYPE GIVEN')
+	print(charges)
+	print(charges[0].Q)
+	
+	pass
 
 func draw_vector(from: Vector2, to: Vector2, colour: Color) -> void:
 	draw_line(from, to, colour, 20.0)
@@ -59,3 +85,10 @@ func zero_out_array(size: int) -> Array:
 	array.resize(size)
 	array.fill(0.0)
 	return array
+
+func _input(event):
+	if event is InputEventMouseButton and event.pressed:
+		# Check for left mouse button (button index 1)
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			var click_position = event.position
+			print("Mouse clicked at: ", click_position)
