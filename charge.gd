@@ -8,7 +8,7 @@ extends Node2D
 
 func _ready() -> void:
 	add_to_group("charge_group")
-	$ChargeLabel.text = "Q = %.2f C" % Q
+	$ChargeLabel.text = "Q \n %.2f C" % Q
 	pass # Replace with function body.
 
 

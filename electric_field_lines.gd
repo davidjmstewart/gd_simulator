@@ -2,7 +2,7 @@ extends Node2D
 
 @export_group("Simulation properties")
 @export var grid_width: float = 100
-@export var grid_resolution: int = 10
+@export var grid_resolution: int = 20
 var horizontal_lines = zero_out_array(512);
 var vertical_lines = zero_out_array(512);
 
@@ -48,35 +48,38 @@ func calculate_electro_static_forces(point_charges: Array[Node], simulation_poin
 		if not (charge is Charge):
 			push_error("Node is not of Charge type")
 			
-	var visual_scaling_factor = 10000 * grid_resolution;
+	var visual_scaling_factor = 100000 * grid_resolution;
 	
-	for charge in point_charges:
-		var point_charge = charge as Charge
+
+	for p in simulation_points:
 		var super_position_resultant_vector = Vector2(0,0)
-		point_charge = point_charges[0]
-		for p in simulation_points:
+
+		for charge in point_charges:
+			var point_charge = charge as Charge
+
 			# v_diff is a vector pointing from the point charge to the simulation point
 			var v_diff = (p - point_charge.position) as Vector2
 			var r_hat = v_diff.normalized() # the unit vector pointing from charge to simulation point
 			var distance = v_diff.length() # distance between the charge and the simulation point
 			var Q = point_charge.Q
-			
+
 			# Calculate the magnitude of the vector we are going to display. This is straight
 			# out of Coulomb's Law, however we also reduce the mangitude here by visual_scaling_factor
 			# otherwise the mangitude of the vectors would be enormous in some cases, and we would
 			# not be able to display them in any sensible/legible manner
 			var magnitude = (1/(4 * PI * permittivity) * Q) / (visual_scaling_factor * distance * distance)
 			
-			var from = p;
-			var vec = magnitude * r_hat;
+			
+			super_position_resultant_vector += magnitude * r_hat;
+			#super_position_resultant_vector += vec;
+		var from = p;
+		var visual_vec: VisualVector = VisualVectorScene.instantiate()
+		visual_vec.from = from
+		visual_vec.width = 25
+		visual_vec.vec = super_position_resultant_vector.clamp(Vector2(-100,-100), Vector2(100,100))
 
-			var visual_vec: VisualVector = VisualVectorScene.instantiate()
-			visual_vec.from = from
-			visual_vec.width = 25
-			visual_vec.vec = vec
-
-			visual_vec.add_to_group("visual_electro_static_force_vectors")
-			add_child(visual_vec)
+		visual_vec.add_to_group("visual_electro_static_force_vectors")
+		add_child(visual_vec)
 
 func draw_vector(from: Vector2, to: Vector2, colour: Color) -> void:
 	draw_line(from, to, colour, 20.0)
@@ -87,11 +90,11 @@ func _draw():
 	var grid_size = $Grid.transform.get_scale();
 	for i in range(grid_resolution):
 		for j in range(grid_resolution):
-			
 			var cen = Vector2(vertical_lines[j]*grid_size.x, horizontal_lines[i]*grid_size.y)
-			var rad = 20
+			var rad = 20/(grid_resolution * 0.2)
 			var col = Color (1,0,0)
 			draw_circle(cen, rad,col)
+			
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	$charge2.position = get_global_mouse_position()
@@ -99,10 +102,9 @@ func _process(delta: float) -> void:
 	var existing_force_vectors = get_tree().get_nodes_in_group("visual_electro_static_force_vectors")
 	for vector in existing_force_vectors:
 		vector.queue_free()
-	calculate_electro_static_forces([simulation_charges[0]], simulation_points)
+	calculate_electro_static_forces(simulation_charges, simulation_points)
 	queue_redraw();
 
-	pass
 	
 func zero_out_array(size: int) -> Array:
 	var array = []
