@@ -7,7 +7,7 @@ var horizontal_lines = zero_out_array(512);
 var vertical_lines = zero_out_array(512);
 
 var VisualVectorScene = preload("res://visual_vector.tscn")
-
+var simulation_points = []
 #float horizontal_lines
 var d = 0;
 var permittivity = 8.8541878188e-12 # e_0, epsilon nough, the absolute dieletric permittivity of a classical vacuum
@@ -32,7 +32,7 @@ func _ready() -> void:
 	# electro static forces. N.B. the previous section was about creating a visual grid
 	# and it was convenient to use UV coordinates for that purpose. This section
 	# uses pixel coordinates as it is more convenient for the calculations we will be doing
-	var simulation_points = []
+
 	for i in range(grid_resolution):
 		for j in range(grid_resolution):
 			simulation_points.append(Vector2(vertical_lines[j] * grid_size.x, horizontal_lines[i]*grid_size.y))
@@ -51,7 +51,6 @@ func calculate_electro_static_forces(point_charges: Array[Node], simulation_poin
 	var visual_scaling_factor = 1000000 * grid_resolution;
 	
 	for charge in point_charges:
-		charge = point_charges[1]
 		var point_charge = charge as Charge
 		for p in simulation_points:
 			var v_diff = (p - point_charge.position) as Vector2
@@ -70,6 +69,7 @@ func calculate_electro_static_forces(point_charges: Array[Node], simulation_poin
 			visual_vec.to = to
 			visual_vec.from = from
 			visual_vec.width = 25
+			visual_vec.add_to_group("visual_electro_static_force_vectors")
 			add_child(visual_vec)
 
 func draw_vector(from: Vector2, to: Vector2, colour: Color) -> void:
@@ -83,12 +83,17 @@ func _draw():
 		for j in range(grid_resolution):
 			
 			var cen = Vector2(vertical_lines[j]*grid_size.x, horizontal_lines[i]*grid_size.y)
-			var rad= 20
+			var rad = 20
 			var col = Color (1,0,0)
 			draw_circle(cen, rad,col)
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	$charge2.position = get_global_mouse_position()
 	var simulation_charges = get_tree().get_nodes_in_group("charge_group")
+	var existing_force_vectors = get_tree().get_nodes_in_group("visual_electro_static_force_vectors")
+	for vector in existing_force_vectors:
+		vector.queue_free()
+	calculate_electro_static_forces([simulation_charges[0]], simulation_points)
 	queue_redraw();
 
 	pass
