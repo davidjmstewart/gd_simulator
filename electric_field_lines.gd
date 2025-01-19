@@ -48,13 +48,17 @@ func calculate_electro_static_forces(point_charges: Array[Node], simulation_poin
 		if not (charge is Charge):
 			push_error("Node is not of Charge type")
 			
-	var visual_scaling_factor = 1000000 * grid_resolution;
+	var visual_scaling_factor = 10000 * grid_resolution;
 	
 	for charge in point_charges:
 		var point_charge = charge as Charge
+		var super_position_resultant_vector = Vector2(0,0)
+		point_charge = point_charges[0]
 		for p in simulation_points:
+			# v_diff is a vector pointing from the point charge to the simulation point
 			var v_diff = (p - point_charge.position) as Vector2
-			var distance = v_diff.length()
+			var r_hat = v_diff.normalized() # the unit vector pointing from charge to simulation point
+			var distance = v_diff.length() # distance between the charge and the simulation point
 			var Q = point_charge.Q
 			
 			# Calculate the magnitude of the vector we are going to display. This is straight
@@ -64,11 +68,13 @@ func calculate_electro_static_forces(point_charges: Array[Node], simulation_poin
 			var magnitude = (1/(4 * PI * permittivity) * Q) / (visual_scaling_factor * distance * distance)
 			
 			var from = p;
-			var to = from + magnitude * v_diff;
+			var vec = magnitude * r_hat;
+
 			var visual_vec: VisualVector = VisualVectorScene.instantiate()
-			visual_vec.to = to
 			visual_vec.from = from
 			visual_vec.width = 25
+			visual_vec.vec = vec
+
 			visual_vec.add_to_group("visual_electro_static_force_vectors")
 			add_child(visual_vec)
 
