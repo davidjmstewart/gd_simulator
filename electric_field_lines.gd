@@ -40,6 +40,12 @@ func _ready() -> void:
 	var simulation_charges = get_tree().get_nodes_in_group("charge_group")
 
 	calculate_electro_static_forces(simulation_charges, simulation_points)
+	
+func charge_node_hover_state_changed(is_hovered: bool) -> void:
+	if (is_hovered):
+		Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
+	else:
+		Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 
 func calculate_electro_static_forces(point_charges: Array[Node], simulation_points: Array):
 
@@ -97,7 +103,7 @@ func _draw():
 			
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	$charge2.position = get_global_mouse_position()
+	#$charge2.position = get_global_mouse_position()
 	var simulation_charges = get_tree().get_nodes_in_group("charge_group")
 	var existing_force_vectors = get_tree().get_nodes_in_group("visual_electro_static_force_vectors")
 	for vector in existing_force_vectors:
