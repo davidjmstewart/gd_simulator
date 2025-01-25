@@ -7,6 +7,8 @@ var horizontal_lines = zero_out_array(512);
 var vertical_lines = zero_out_array(512);
 
 var VisualVectorScene = preload("res://visual_vector.tscn")
+var PointChargeScene = preload("res://charge.tscn")
+
 var simulation_points = []
 #float horizontal_lines
 var d = 0;
@@ -124,3 +126,22 @@ func _input(event):
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			var click_position = event.position
 			print("Mouse clicked at: ", click_position)
+
+
+func _on_control_panel_point_charge_created(charge: float) -> void:
+	print (charge)
+	var point_charge: Charge = PointChargeScene.instantiate()
+	point_charge.Q = charge;
+	var grid_size = $Grid.transform.get_scale();
+	var bounds =   $Grid.transform.get_scale()  # Get Rect2 for the area
+	var random_position = Vector2(
+		randf_range(0, bounds.x ),
+		randf_range(0, bounds.y)
+	)
+
+	point_charge.position = random_position
+	add_child(point_charge)
+
+	# choose a random point on the screen to place charge
+	
+	pass # Replace with function body.

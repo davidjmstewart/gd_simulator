@@ -16,12 +16,13 @@ default_font_size = 110
 
 [node name="charge" type="Node2D" groups=["chage_group"]]
 z_index = 860
+scale = Vector2(0.1, 0.1)
 script = ExtResource("1_eomhk")
 Q = 1.745
 
 [node name="Area2D" type="Area2D" parent="."]
 z_index = 4035
-scale = Vector2(26.865, 26.865)
+scale = Vector2(27.87, 27.87)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_3glq5")
@@ -40,7 +41,7 @@ offset_right = 269.0
 offset_bottom = 190.0
 theme = SubResource("Theme_hi0tq")
 text = "Q 
-1.75 C"
+ 1.75 C"
 horizontal_alignment = 1
 vertical_alignment = 1
 
