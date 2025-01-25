@@ -3,6 +3,8 @@ extends Node2D
 @export_group("Simulation properties")
 @export var grid_width: float = 100
 @export var grid_resolution: int = 20
+@export var visual_scaling_factor = 100000;
+
 var horizontal_lines = zero_out_array(512);
 var vertical_lines = zero_out_array(512);
 
@@ -55,9 +57,6 @@ func calculate_electro_static_forces(point_charges: Array[Node], simulation_poin
 	for charge in point_charges:
 		if not (charge is Charge):
 			push_error("Node is not of Charge type")
-			
-	var visual_scaling_factor = 100000 * grid_resolution;
-	
 
 	for p in simulation_points:
 		var super_position_resultant_vector = Vector2(0,0)
@@ -144,4 +143,9 @@ func _on_control_panel_point_charge_created(charge: float) -> void:
 
 	# choose a random point on the screen to place charge
 	
+	pass # Replace with function body.
+
+
+func _on_visual_scaling_slider_value_changed(value: float) -> void:
+	visual_scaling_factor = value;
 	pass # Replace with function body.
