@@ -18,7 +18,6 @@ func handle_state_machine() -> void:
 	if state == UserInteractionStates.MOVING:
 		Input.set_default_cursor_shape(Input.CURSOR_DRAG)
 		self.position = get_global_mouse_position()
-
 func _process(delta: float) -> void:
 	handle_state_machine()
 	if Q >= 0:

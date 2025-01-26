@@ -10,7 +10,9 @@ var vertical_lines = zero_out_array(512);
 
 var VisualVectorScene = preload("res://visual_vector.tscn")
 var PointChargeScene = preload("res://charge.tscn")
-
+enum CameraInteractionState {IDLE, MOVING}
+var state: CameraInteractionState = CameraInteractionState.IDLE
+var camera_movement_start = Vector2(0,0);
 var simulation_points = []
 #float horizontal_lines
 var d = 0;
@@ -104,6 +106,15 @@ func _draw():
 			
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	const zoom_speed = Vector2(0.2, 0.2);
+	const min_zoom = Vector2(0.4, 0.4);
+	const max_zoom = Vector2(3,3);
+
+	if Input.is_action_just_pressed("scroll_up"):
+		$Camera2D.zoom = clamp($Camera2D.zoom + zoom_speed, min_zoom, max_zoom);
+	elif Input.is_action_just_pressed("scroll_down"):
+		$Camera2D.zoom = clamp($Camera2D.zoom - zoom_speed, min_zoom, max_zoom);
+
 	#$charge2.position = get_global_mouse_position()
 	var simulation_charges = get_tree().get_nodes_in_group("charge_group")
 	var existing_force_vectors = get_tree().get_nodes_in_group("visual_electro_static_force_vectors")
@@ -121,10 +132,23 @@ func zero_out_array(size: int) -> Array:
 
 func _input(event):
 	if event is InputEventMouseButton and event.pressed:
+		var mouse_button_event: InputEventMouseButton = event
+		if mouse_button_event.button_index == MOUSE_BUTTON_MIDDLE:
+			Input.set_default_cursor_shape(Input.CURSOR_DRAG)
+
+			state = CameraInteractionState.MOVING
+			camera_movement_start = get_global_mouse_position()
 		# Check for left mouse button (button index 1)
-		if event.button_index == MOUSE_BUTTON_LEFT:
+		elif event.button_index == MOUSE_BUTTON_LEFT:
 			var click_position = event.position
 			print("Mouse clicked at: ", click_position)
+	if event is InputEventMouseButton and not event.pressed:
+		state = CameraInteractionState.IDLE
+		Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+
+	if event is InputEventMouseMotion and state == CameraInteractionState.MOVING:
+		$Camera2D.position -= event.relative
+		
 
 
 func _on_control_panel_point_charge_created(charge: float) -> void:

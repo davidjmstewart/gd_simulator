@@ -794,6 +794,9 @@ min_value = 1.0
 max_value = 1e+07
 value = 700000.0
 
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(577, 328)
+
 [connection signal="point_charge_created" from="ControlPanel" to="." method="_on_control_panel_point_charge_created"]
 [connection signal="button_up" from="ControlPanel/AddChargeButton" to="ControlPanel" method="_on_add_charge_button_button_up"]
 [connection signal="text_changed" from="ControlPanel/ChargeEntryField" to="ControlPanel" method="_on_charge_entry_field_text_changed"]
