@@ -1,9 +1,11 @@
 extends Node2D
 
+
 @export_group("Simulation properties")
 @export var grid_width: float = 100
 @export var grid_resolution: int = 20
 @export var visual_scaling_factor = 100000;
+
 
 var horizontal_lines = zero_out_array(512);
 var vertical_lines = zero_out_array(512);
@@ -46,7 +48,7 @@ func _ready() -> void:
 	var simulation_charges = get_tree().get_nodes_in_group("charge_group")
 
 	calculate_electro_static_forces(simulation_charges, simulation_points)
-	
+	$VectorInfoPanel.visible = false;
 func charge_node_hover_state_changed(is_hovered: bool) -> void:
 	if (is_hovered):
 		Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
@@ -109,12 +111,26 @@ func _process(delta: float) -> void:
 	const zoom_speed = Vector2(0.2, 0.2);
 	const min_zoom = Vector2(0.4, 0.4);
 	const max_zoom = Vector2(3,3);
-
+	
 	if Input.is_action_just_pressed("scroll_up"):
+		
+		var mouse_pos := get_global_mouse_position()
+		
 		$Camera2D.zoom = clamp($Camera2D.zoom + zoom_speed, min_zoom, max_zoom);
+		if $Camera2D.zoom < max_zoom:
+			#$Camera2D.position = ($Camera2D.position + get_local_mouse_position()) / 2.0;
+			var new_mouse_pos := get_global_mouse_position()
+			$Camera2D.position += mouse_pos - new_mouse_pos
+			print (  "mouse_pos:  %v \t new_mouse_pos: %v " % [mouse_pos, new_mouse_pos])
 	elif Input.is_action_just_pressed("scroll_down"):
-		$Camera2D.zoom = clamp($Camera2D.zoom - zoom_speed, min_zoom, max_zoom);
+		var mouse_pos := get_global_mouse_position()
 
+		$Camera2D.zoom = clamp($Camera2D.zoom - zoom_speed, min_zoom, max_zoom);
+		if $Camera2D.zoom > min_zoom:
+			#$Camera2D.position = ($Camera2D.position + get_local_mouse_position()) / 2.0;
+			var new_mouse_pos := get_global_mouse_position()
+			$Camera2D.position += mouse_pos - new_mouse_pos
+			print (  "mouse_pos:  %v \t new_mouse_pos: %v " % [mouse_pos, new_mouse_pos])
 	#$charge2.position = get_global_mouse_position()
 	var simulation_charges = get_tree().get_nodes_in_group("charge_group")
 	var existing_force_vectors = get_tree().get_nodes_in_group("visual_electro_static_force_vectors")
@@ -142,12 +158,13 @@ func _input(event):
 		elif event.button_index == MOUSE_BUTTON_LEFT:
 			var click_position = event.position
 			print("Mouse clicked at: ", click_position)
+			print("Mouse position at: ", get_global_mouse_position())
 	if event is InputEventMouseButton and not event.pressed:
 		state = CameraInteractionState.IDLE
 		Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 
 	if event is InputEventMouseMotion and state == CameraInteractionState.MOVING:
-		$Camera2D.position -= event.relative
+		$Camera2D.position -= (event.relative / $Camera2D.zoom.x)
 		
 
 

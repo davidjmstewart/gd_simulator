@@ -1,10 +1,11 @@
-[gd_scene load_steps=14 format=4 uid="uid://c1v88a8qn38wv"]
+[gd_scene load_steps=15 format=4 uid="uid://c1v88a8qn38wv"]
 
 [ext_resource type="Script" path="res://electric_field_lines.gd" id="1_l2tnr"]
 [ext_resource type="PackedScene" uid="uid://b7w50dlugo30s" path="res://charge.tscn" id="2_asb1d"]
 [ext_resource type="Shader" path="res://electric_field_lines.gdshader" id="3_pts4k"]
 [ext_resource type="Script" path="res://control_panel.gd" id="4_ibs24"]
 [ext_resource type="FontFile" uid="uid://dg4yh0kyjqg4d" path="res://assets/fonts/computer-modern/cmunvt.ttf" id="5_ic3gt"]
+[ext_resource type="Script" path="res://vector_info_panel.gd" id="6_gs6gw"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kcsxv"]
 shader = ExtResource("3_pts4k")
@@ -712,16 +713,12 @@ position = Vector2(576, 324)
 scale = Vector2(1152, 648)
 texture = SubResource("CanvasTexture_laeyo")
 
-[node name="ControlPanel" type="Control" parent="."]
-z_index = 1155
-layout_mode = 3
-anchors_preset = 0
+[node name="ControlPanel" type="CanvasLayer" parent="."]
 script = ExtResource("4_ibs24")
 metadata/_edit_use_anchors_ = true
 
 [node name="ControlPanelLabel" type="RichTextLabel" parent="ControlPanel"]
 z_index = 85
-layout_mode = 0
 offset_left = 2.0
 offset_top = 2.0
 offset_right = 184.0
@@ -732,7 +729,6 @@ text = "CONTROL PANEL"
 
 [node name="ChargeLabel" type="RichTextLabel" parent="ControlPanel"]
 z_index = 85
-layout_mode = 0
 offset_left = 9.0
 offset_top = 53.0
 offset_right = 219.0
@@ -742,12 +738,10 @@ theme_override_colors/default_color = Color(0, 0, 0, 1)
 text = "CHARGE PROPERTIES"
 
 [node name="ColorRect" type="ColorRect" parent="ControlPanel"]
-layout_mode = 0
 offset_right = 231.0
 offset_bottom = 273.0
 
 [node name="AddChargeButton" type="Button" parent="ControlPanel"]
-layout_mode = 0
 offset_left = 55.0
 offset_top = 140.0
 offset_right = 165.0
@@ -755,7 +749,6 @@ offset_bottom = 171.0
 text = "ADD CHARGE"
 
 [node name="ChargeEntryField" type="TextEdit" parent="ControlPanel"]
-layout_mode = 0
 offset_left = 16.0
 offset_top = 81.0
 offset_right = 207.0
@@ -764,7 +757,6 @@ placeholder_text = "Charge (C)"
 
 [node name="SimulationPropertiesLabel" type="RichTextLabel" parent="ControlPanel"]
 z_index = 85
-layout_mode = 0
 offset_left = 9.0
 offset_top = 194.0
 offset_right = 239.0
@@ -775,7 +767,6 @@ text = "SIMULATION PROPERTIES"
 
 [node name="VisualScalingFactorSliderLabel" type="RichTextLabel" parent="ControlPanel"]
 z_index = 85
-layout_mode = 0
 offset_left = 9.0
 offset_top = 216.0
 offset_right = 239.0
@@ -785,7 +776,6 @@ theme_override_colors/default_color = Color(0, 0, 0, 1)
 text = "Visual Scaling Factor"
 
 [node name="VisualScalingSlider" type="HSlider" parent="ControlPanel"]
-layout_mode = 0
 offset_left = 15.0
 offset_top = 238.0
 offset_right = 218.0
@@ -796,6 +786,17 @@ value = 700000.0
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(577, 328)
+skew = 0.0174533
+
+[node name="VectorInfoPanel" type="CanvasLayer" parent="."]
+layer = -128
+script = ExtResource("6_gs6gw")
+
+[node name="PanelBackground" type="ColorRect" parent="VectorInfoPanel"]
+offset_left = 911.0
+offset_top = 294.0
+offset_right = 1142.0
+offset_bottom = 567.0
 
 [connection signal="point_charge_created" from="ControlPanel" to="." method="_on_control_panel_point_charge_created"]
 [connection signal="button_up" from="ControlPanel/AddChargeButton" to="ControlPanel" method="_on_add_charge_button_button_up"]

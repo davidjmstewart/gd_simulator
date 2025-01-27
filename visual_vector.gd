@@ -2,6 +2,11 @@
 class_name VisualVector
 extends Node2D
 
+enum UserInteractionState {IDLE, HOVERING}
+var state: UserInteractionState = UserInteractionState.IDLE
+# When the user hovers over this vector, signal out the magnitude of it
+signal vector_hovered(vec: Vector2)
+
 # We have two ways of descring the vector: with coordinates from and to
 # where from is where the vector starts and to is where the vector ends
 # alternatively, we can set vec, which describes the vector in the classical sense,
@@ -79,7 +84,8 @@ func update_vector() -> void:
 	VectorLine.add_point(first_line_point)
 	VectorLine.add_point(second_line_point)
 	VectorLine.default_color = Color.GREEN;
-
+	$Area2D/CollisionPolygon2D.polygon = VectorHead.polygon
+	$Area2D/CollisionPolygon2D.position = VectorHead.position
 	self.position = from;
 	self.rotation = angle;
 	
@@ -90,3 +96,17 @@ func _ready() -> void:
 
 #func _draw() -> void:
 	#draw_circle(pivot_point, 10, Color.PURPLE)
+
+
+func _on_area_2d_mouse_entered() -> void:
+	print('entered')
+	state = UserInteractionState.HOVERING
+	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
+	vector_hovered.emit(vec)
+	
+func _on_area_2d_mouse_exited() -> void:
+	print('exited')
+	state = UserInteractionState.IDLE
+	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+
+	vector_hovered.emit(vec)

@@ -1,4 +1,4 @@
-extends Control
+extends CanvasLayer
 signal point_charge_created(charge: float)
 
 var _charge: float = 0.0
