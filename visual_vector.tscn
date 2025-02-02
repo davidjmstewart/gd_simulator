@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://visual_vector.gd" id="1_fbmb6"]
 
-[node name="VisualVector" type="Node2D"]
+[node name="VisualVector" type="Node2D" groups=["visual_vector"]]
 position = Vector2(100, 100)
 rotation = 0.785398
 script = ExtResource("1_fbmb6")

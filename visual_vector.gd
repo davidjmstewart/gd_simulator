@@ -99,13 +99,11 @@ func _ready() -> void:
 
 
 func _on_area_2d_mouse_entered() -> void:
-	print('entered')
 	state = UserInteractionState.HOVERING
 	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
 	vector_hovered.emit(vec)
 	
 func _on_area_2d_mouse_exited() -> void:
-	print('exited')
 	state = UserInteractionState.IDLE
 	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 

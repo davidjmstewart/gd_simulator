@@ -5,7 +5,6 @@
 [ext_resource type="Shader" path="res://electric_field_lines.gdshader" id="3_pts4k"]
 [ext_resource type="Script" path="res://control_panel.gd" id="4_ibs24"]
 [ext_resource type="FontFile" uid="uid://dg4yh0kyjqg4d" path="res://assets/fonts/computer-modern/cmunvt.ttf" id="5_ic3gt"]
-[ext_resource type="Script" path="res://vector_info_panel.gd" id="6_gs6gw"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kcsxv"]
 shader = ExtResource("3_pts4k")
@@ -691,8 +690,12 @@ default_font = SubResource("FontFile_s14x8")
 [sub_resource type="Theme" id="Theme_83ndo"]
 default_font = ExtResource("5_ic3gt")
 
+[sub_resource type="Theme" id="Theme_6f020"]
+default_font = ExtResource("5_ic3gt")
+
 [node name="main" type="Node2D"]
 script = ExtResource("1_l2tnr")
+max_visual_vector_size = 45
 
 [node name="charge2" parent="." instance=ExtResource("2_asb1d")]
 position = Vector2(729, 277)
@@ -726,6 +729,7 @@ offset_bottom = 41.0
 theme = SubResource("Theme_rludx")
 theme_override_colors/default_color = Color(0, 0, 0, 1)
 text = "CONTROL PANEL"
+metadata/_edit_use_anchors_ = true
 
 [node name="ChargeLabel" type="RichTextLabel" parent="ControlPanel"]
 z_index = 85
@@ -736,10 +740,15 @@ offset_bottom = 80.0
 theme = SubResource("Theme_83ndo")
 theme_override_colors/default_color = Color(0, 0, 0, 1)
 text = "CHARGE PROPERTIES"
+metadata/_edit_use_anchors_ = true
 
 [node name="ColorRect" type="ColorRect" parent="ControlPanel"]
+anchors_preset = -1
+anchor_bottom = 0.12037
 offset_right = 231.0
 offset_bottom = 273.0
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
 
 [node name="AddChargeButton" type="Button" parent="ControlPanel"]
 offset_left = 55.0
@@ -747,6 +756,7 @@ offset_top = 140.0
 offset_right = 165.0
 offset_bottom = 171.0
 text = "ADD CHARGE"
+metadata/_edit_use_anchors_ = true
 
 [node name="ChargeEntryField" type="TextEdit" parent="ControlPanel"]
 offset_left = 16.0
@@ -754,6 +764,7 @@ offset_top = 81.0
 offset_right = 207.0
 offset_bottom = 124.0
 placeholder_text = "Charge (C)"
+metadata/_edit_use_anchors_ = true
 
 [node name="SimulationPropertiesLabel" type="RichTextLabel" parent="ControlPanel"]
 z_index = 85
@@ -764,6 +775,7 @@ offset_bottom = 221.0
 theme = SubResource("Theme_83ndo")
 theme_override_colors/default_color = Color(0, 0, 0, 1)
 text = "SIMULATION PROPERTIES"
+metadata/_edit_use_anchors_ = true
 
 [node name="VisualScalingFactorSliderLabel" type="RichTextLabel" parent="ControlPanel"]
 z_index = 85
@@ -774,6 +786,7 @@ offset_bottom = 243.0
 theme = SubResource("Theme_83ndo")
 theme_override_colors/default_color = Color(0, 0, 0, 1)
 text = "Visual Scaling Factor"
+metadata/_edit_use_anchors_ = true
 
 [node name="VisualScalingSlider" type="HSlider" parent="ControlPanel"]
 offset_left = 15.0
@@ -783,22 +796,37 @@ offset_bottom = 254.0
 min_value = 1.0
 max_value = 1e+07
 value = 700000.0
+metadata/_edit_use_anchors_ = true
+
+[node name="UseMaxVectorSize" type="CheckBox" parent="ControlPanel"]
+offset_left = 11.0
+offset_top = 271.0
+offset_right = 177.0
+offset_bottom = 302.0
+theme = SubResource("Theme_6f020")
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Clamp Vector Size"
+
+[node name="VectorClampSlider" type="HSlider" parent="ControlPanel"]
+offset_left = 15.0
+offset_top = 299.0
+offset_right = 218.0
+offset_bottom = 315.0
+min_value = 1.0
+max_value = 1000.0
+value = 50.0
+metadata/_edit_use_anchors_ = true
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(577, 328)
 skew = 0.0174533
 
-[node name="VectorInfoPanel" type="CanvasLayer" parent="."]
-layer = -128
-script = ExtResource("6_gs6gw")
-
-[node name="PanelBackground" type="ColorRect" parent="VectorInfoPanel"]
-offset_left = 911.0
-offset_top = 294.0
-offset_right = 1142.0
-offset_bottom = 567.0
-
 [connection signal="point_charge_created" from="ControlPanel" to="." method="_on_control_panel_point_charge_created"]
 [connection signal="button_up" from="ControlPanel/AddChargeButton" to="ControlPanel" method="_on_add_charge_button_button_up"]
 [connection signal="text_changed" from="ControlPanel/ChargeEntryField" to="ControlPanel" method="_on_charge_entry_field_text_changed"]
 [connection signal="value_changed" from="ControlPanel/VisualScalingSlider" to="." method="_on_visual_scaling_slider_value_changed"]
+[connection signal="toggled" from="ControlPanel/UseMaxVectorSize" to="." method="_on_use_max_vector_size_toggled"]
+[connection signal="value_changed" from="ControlPanel/VectorClampSlider" to="." method="_on_vector_clamp_slider_value_changed"]
