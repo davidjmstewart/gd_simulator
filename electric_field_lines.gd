@@ -59,6 +59,7 @@ func initialise_visual_vectors(simulation_points: Array):
 	for p in simulation_points:
 		var visual_vec: VisualVector = VisualVectorScene.instantiate()
 		visual_vec.add_to_group("visual_vector")
+		visual_vec.vector_hovered.connect(_on_vector_hovered)
 		add_child(visual_vec)
 
 func calculate_electro_static_forces(point_charges: Array[Node], simulation_points: Array) -> Array[Vector2]:
@@ -69,7 +70,7 @@ func calculate_electro_static_forces(point_charges: Array[Node], simulation_poin
 	for charge in point_charges:
 		if not (charge is Charge):
 			push_error("Node is not of Charge type")
-	# Ensure that there are many visual vectors as simulation points
+	# Ensure that there are as many visual vectors as simulation points
 	for p in simulation_points:
 		var super_position_resultant_vector = Vector2(0,0)
 
@@ -92,13 +93,9 @@ func calculate_electro_static_forces(point_charges: Array[Node], simulation_poin
 		forces.append(super_position_resultant_vector)
 
 	return forces;
-		
-
-func draw_vector(from: Vector2, to: Vector2, colour: Color) -> void:
-	draw_line(from, to, colour, 20.0)
-	
+			
 func _draw():
-	# draw_vector(Vector2(1.5, 1.0), Vector2(10.5, 40.0), Color.GREEN)
+
 	# Draw a dot at each grid intersection point, to mark the spot in which we will calculate the electric field
 	var grid_size = $Grid.transform.get_scale();
 	for i in range(grid_resolution):
@@ -207,3 +204,10 @@ func _on_vector_clamp_slider_value_changed(value: float) -> void:
 
 func _on_use_max_vector_size_toggled(toggled_on: bool) -> void:
 	use_vector_clamping = toggled_on;
+
+func _on_vector_hovered(item_instance):
+	# The 'item_instance' argument tells you WHICH item emitted the signal
+	print('hovered!')
+	# Add your hover logic here (e.g., change color, show tooltip)
+	# Example: item_instance.modulate = Color.YELLOW_GREEN
+	pass # Replace with your actual logic

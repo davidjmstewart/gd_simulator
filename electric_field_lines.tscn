@@ -1,9 +1,9 @@
 [gd_scene load_steps=15 format=4 uid="uid://c1v88a8qn38wv"]
 
-[ext_resource type="Script" path="res://electric_field_lines.gd" id="1_l2tnr"]
+[ext_resource type="Script" uid="uid://1pkwem1e4iio" path="res://electric_field_lines.gd" id="1_l2tnr"]
 [ext_resource type="PackedScene" uid="uid://b7w50dlugo30s" path="res://charge.tscn" id="2_asb1d"]
-[ext_resource type="Shader" path="res://electric_field_lines.gdshader" id="3_pts4k"]
-[ext_resource type="Script" path="res://control_panel.gd" id="4_ibs24"]
+[ext_resource type="Shader" uid="uid://chfe485llx6qg" path="res://electric_field_lines.gdshader" id="3_pts4k"]
+[ext_resource type="Script" uid="uid://drdn0giw2kx0q" path="res://control_panel.gd" id="4_ibs24"]
 [ext_resource type="FontFile" uid="uid://dg4yh0kyjqg4d" path="res://assets/fonts/computer-modern/cmunvt.ttf" id="5_ic3gt"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kcsxv"]
@@ -805,9 +805,9 @@ offset_right = 177.0
 offset_bottom = 302.0
 theme = SubResource("Theme_6f020")
 theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
-theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
-theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
 text = "Clamp Vector Size"
 
 [node name="VectorClampSlider" type="HSlider" parent="ControlPanel"]
