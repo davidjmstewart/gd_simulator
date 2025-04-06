@@ -174,8 +174,11 @@ func _input(event):
 		# Check for left mouse button (button index 1)
 		elif event.button_index == MOUSE_BUTTON_LEFT:
 			var click_position = event.position
-			print("Mouse clicked at: ", click_position)
-			print("Mouse position at: ", get_global_mouse_position())
+
+			print("Event.position: ", event.position)
+			print("Event.global_position: ", event.global_position)
+			print("get_global_mouse_position: ",get_global_mouse_position())
+			print("")
 	if event is InputEventMouseButton and not event.pressed:
 		state = CameraInteractionState.IDLE
 		Input.set_default_cursor_shape(Input.CURSOR_ARROW)
