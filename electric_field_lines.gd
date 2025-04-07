@@ -17,7 +17,7 @@ var simulation_points = []
 var use_vector_clamping: bool =  false;
 var d = 0;
 var permittivity = 8.8541878188e-12 # e_0, epsilon nought, the absolute dieletric permittivity of a classical vacuum
-
+var last_hovered_vector = null;
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 
@@ -60,6 +60,8 @@ func initialise_visual_vectors(simulation_points: Array):
 		var visual_vec: VisualVector = VisualVectorScene.instantiate()
 		visual_vec.add_to_group("visual_vector")
 		visual_vec.vector_hovered.connect(_on_vector_hovered)
+		visual_vec.vector_exited.connect(_on_vector_exited)
+
 		add_child(visual_vec)
 
 func calculate_electro_static_forces(point_charges: Array[Node], simulation_points: Array) -> Array[Vector2]:
@@ -208,9 +210,17 @@ func _on_vector_clamp_slider_value_changed(value: float) -> void:
 func _on_use_max_vector_size_toggled(toggled_on: bool) -> void:
 	use_vector_clamping = toggled_on;
 
-func _on_vector_hovered(item_instance):
-	# The 'item_instance' argument tells you WHICH item emitted the signal
-	print('hovered!')
+func _on_vector_hovered(vec: VisualVector):
+	print('vector hovered!')
+	print(vec.vec)
+	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
+	if (vec):
+		last_hovered_vector = vec
+
 	# Add your hover logic here (e.g., change color, show tooltip)
 	# Example: item_instance.modulate = Color.YELLOW_GREEN
 	pass # Replace with your actual logic
+func _on_vector_exited(vec: VisualVector):
+	if (vec == last_hovered_vector):
+		print('The last hovered vector has been exited - update UI')
+		Input.set_default_cursor_shape(Input.CURSOR_ARROW)

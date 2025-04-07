@@ -5,7 +5,9 @@ extends Node2D
 enum UserInteractionState {IDLE, HOVERING}
 var state: UserInteractionState = UserInteractionState.IDLE
 # When the user hovers over this vector, signal out the magnitude of it
-signal vector_hovered(vec: Vector2)
+signal vector_hovered(vec: VisualVector)
+
+signal vector_exited(vec: VisualVector)
 
 # We have two ways of descring the vector: with coordinates from and to
 # where from is where the vector starts and to is where the vector ends
@@ -100,11 +102,11 @@ func _ready() -> void:
 
 func _on_area_2d_mouse_entered() -> void:
 	state = UserInteractionState.HOVERING
-	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
-	vector_hovered.emit(vec)
+	#Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
+	vector_hovered.emit(self)
 	
 func _on_area_2d_mouse_exited() -> void:
 	state = UserInteractionState.IDLE
-	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
-
-	vector_hovered.emit(vec)
+	#Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+	
+	vector_exited.emit(self)
