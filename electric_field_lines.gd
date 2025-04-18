@@ -97,7 +97,7 @@ func calculate_electro_static_forces(point_charges: Array[Node], simulation_poin
 	return forces;
 			
 func _draw():
-
+	
 	# Draw a dot at each grid intersection point, to mark the spot in which we will calculate the electric field
 	var grid_size = $Grid.transform.get_scale();
 	for i in range(grid_resolution):
@@ -109,6 +109,9 @@ func _draw():
 			
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	#print(is_node_type_hovered())
+	print(_is_vector_hovered())
+	
 	var visual_vectors: Array = get_tree().get_nodes_in_group("visual_vector")
 	# Do some basic sanity checking to make sure that each node in this group is
 	# actually a visual_vector
@@ -213,13 +216,181 @@ func _on_use_max_vector_size_toggled(toggled_on: bool) -> void:
 func _on_vector_hovered(vec: VisualVector):
 	print('vector hovered!')
 	print(vec.vec)
+	_is_vector_hovered()
+
 	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
 	if (vec):
 		last_hovered_vector = vec
+		#
+func is_node_type_hovered(target_identifier = "VisualVector") -> bool: # Defaulting to string name
+	# --- Input Validation ---
+	if target_identifier == null:
+		printerr("is_node_type_hovered: target_identifier cannot be null.")
+		return false
+	# Prevent empty strings, as is_class("") might behave unexpectedly
+	if target_identifier is String and target_identifier.is_empty():
+		printerr("is_node_type_hovered: target_identifier string cannot be empty.")
+		return false
 
-	# Add your hover logic here (e.g., change color, show tooltip)
-	# Example: item_instance.modulate = Color.YELLOW_GREEN
-	pass # Replace with your actual logic
+	# --- Physics Query Setup (Same as before) ---
+	var viewport_mouse_pos: Vector2 = get_viewport().get_mouse_position()
+	var global_mouse_pos: Vector2 = get_viewport().get_canvas_transform().affine_inverse() * viewport_mouse_pos
+	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
+	var query := PhysicsPointQueryParameters2D.new()
+	query.position = global_mouse_pos
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	var results: Array[Dictionary] = space_state.intersect_point(query)
+
+	# --- Check Results ---
+	for result in results:
+		var collider_node = result.get("collider")
+		var current_node_to_check = collider_node
+
+		while current_node_to_check:
+			var match_found = false
+			var node_script = current_node_to_check.get_script()
+
+			# --- Final Check Logic ---
+
+			# 1. Check if target is a String (path or class name) - Handles MOST cases
+			if target_identifier is String or target_identifier is StringName:
+				var target_str = str(target_identifier)
+				if target_str.begins_with("res://"): # Script path check
+					if node_script != null and node_script.resource_path == target_str:
+						match_found = true
+				else: # Class name check (engine type or registered script name)
+					# is_class() reliably checks inheritance chain for the given name
+					if current_node_to_check.is_class(target_str):
+						match_found = true
+
+			# 2. Check if target is a Script resource - Handles load("res://path.gd")
+			elif target_identifier is Script:
+				if node_script == target_identifier:
+					match_found = true
+
+			# 3. No longer attempting the 'typeof(target_identifier) == TYPE_OBJECT' check
+			#    using 'is target_identifier', as it causes parsing errors.
+
+			else:
+				# Handle only clearly unsupported types if necessary
+				# This condition might now be unreachable if only Strings/Scripts are expected
+				printerr("is_node_type_hovered: Unsupported target_identifier type provided: ", typeof(target_identifier), ". Please use a String (class name/script path) or a loaded Script resource.")
+				# Optionally 'return false' or 'break' here if strict type checking is desired
+
+			# --- End of Final Check Logic ---
+
+			if match_found:
+				return true
+
+			# Move up the hierarchy (owner then parent) - same as before
+			var owner = current_node_to_check.get_owner()
+			if owner and owner != current_node_to_check:
+				current_node_to_check = owner
+			else:
+				var parent = current_node_to_check.get_parent()
+				if parent == null or parent == current_node_to_check:
+					current_node_to_check = null
+				else:
+					current_node_to_check = parent
+
+	return false
+func _get_hovered_colliders():
+	# N.B. Gemini created
+	# 1. Get mouse position in viewport coordinates
+	var viewport_mouse_pos: Vector2 = get_viewport().get_mouse_position()
+
+	# 2. Get the viewport's transform (World -> Viewport)
+	var canvas_transform: Transform2D = get_viewport().get_canvas_transform()
+
+	# 3. Calculate the inverse transform (Viewport -> World)
+	var inverse_canvas_transform: Transform2D = canvas_transform.affine_inverse()
+
+	# 4. Convert viewport mouse position to global world coordinates
+	var global_mouse_pos: Vector2 = inverse_canvas_transform * viewport_mouse_pos
+	# Note: If this script is on a CanvasItem (like Node2D, Control, etc.),
+	# you could potentially use get_global_mouse_position(), but the transform
+	# method above is more universally applicable regardless of where this
+	# function resides.
+
+	# 5. Get the direct space state
+	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
+
+	# 6. Set up the query using GLOBAL coordinates
+	var query := PhysicsPointQueryParameters2D.new()
+	query.position = global_mouse_pos # Use the CORRECT coordinate space!
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	# query.collision_mask = YOUR_VECTOR_LAYER_MASK # Optional: Filter by physics layer
+
+	# 7. Perform the query
+	var results: Array[Dictionary] = space_state.intersect_point(query)
+	
+	return results
+func _is_vector_hovered():
+	#print('_is_vector_hovered called')
+	## N.B. Gemini created
+	## 1. Get mouse position in viewport coordinates
+	#var viewport_mouse_pos: Vector2 = get_viewport().get_mouse_position()
+#
+	## 2. Get the viewport's transform (World -> Viewport)
+	#var canvas_transform: Transform2D = get_viewport().get_canvas_transform()
+#
+	## 3. Calculate the inverse transform (Viewport -> World)
+	#var inverse_canvas_transform: Transform2D = canvas_transform.affine_inverse()
+#
+	## 4. Convert viewport mouse position to global world coordinates
+	#var global_mouse_pos: Vector2 = inverse_canvas_transform * viewport_mouse_pos
+	## Note: If this script is on a CanvasItem (like Node2D, Control, etc.),
+	## you could potentially use get_global_mouse_position(), but the transform
+	## method above is more universally applicable regardless of where this
+	## function resides.
+#
+	## 5. Get the direct space state
+	#var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
+#
+	## 6. Set up the query using GLOBAL coordinates
+	#var query := PhysicsPointQueryParameters2D.new()
+	#query.position = global_mouse_pos # Use the CORRECT coordinate space!
+	#query.collide_with_areas = true
+	#query.collide_with_bodies = true
+	## query.collision_mask = YOUR_VECTOR_LAYER_MASK # Optional: Filter by physics layer
+#
+	## 7. Perform the query
+	#var results: Array[Dictionary] = space_state.intersect_point(query)
+	var results = _get_hovered_colliders()
+	# 8. Check results
+	for result in results:
+		print(result)
+		var collider_node = result.get("collider")
+
+		# IMPORTANT: The collider might be the CollisionShape2D or the body node
+		# itself (Area2D/PhysicsBody2D) if it's a child of VisualVector.
+		# We need to check if the collider OR its owner/parent is the VisualVector.
+		# Using owner is generally preferred if the scene is packed correctly.
+		var potential_vector_node = collider_node
+		while potential_vector_node:
+			if potential_vector_node is VisualVector:
+				# Optional: Check visibility if needed
+				# if potential_vector_node.is_visible_in_tree():
+				return true # Found it!
+
+			# Try owner first (if scene instance is packed correctly)
+			var owner = potential_vector_node.get_owner()
+			if owner and owner is VisualVector:
+				# if owner.is_visible_in_tree():
+				return true # Found via owner!
+
+			# If owner didn't work or wasn't the VisualVector, try parent
+			# But stop if we reach the root or loop infinitely
+			var parent = potential_vector_node.get_parent()
+			if parent == potential_vector_node: # Should not happen, but safeguard
+				break
+			potential_vector_node = parent
+
+	# If loop finishes without finding a VisualVector
+	return false
+
 func _on_vector_exited(vec: VisualVector):
 	if (vec == last_hovered_vector):
 		print('The last hovered vector has been exited - update UI')
