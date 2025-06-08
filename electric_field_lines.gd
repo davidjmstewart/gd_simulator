@@ -16,9 +16,8 @@ var camera_movement_start = Vector2(0,0);
 var simulation_points = []
 var use_vector_clamping: bool =  false;
 var d = 0;
-var permittivity = 8.8541878188e-12 # e_0, epsilon nought, the absolute dieletric permittivity of a classical vacuum
 var last_hovered_vector = null;
-# Called when the node enters the scene tree for the first time.
+
 func _ready() -> void:
 
 	# This section calculates the grid for displaying in a shader
@@ -63,38 +62,6 @@ func initialise_visual_vectors(simulation_points: Array):
 		visual_vec.vector_exited.connect(_on_vector_exited)
 
 		add_child(visual_vec)
-
-func calculate_electro_static_forces(point_charges: Array[Node], simulation_points: Array) -> Array[Vector2]:
-	
-	var forces: Array[Vector2];
-	# VALIDATION SECTION
-	# Basic valdiation to make sure the Nodes are actually charges
-	for charge in point_charges:
-		if not (charge is Charge):
-			push_error("Node is not of Charge type")
-	# Ensure that there are as many visual vectors as simulation points
-	for p in simulation_points:
-		var super_position_resultant_vector = Vector2(0,0)
-
-		for charge in point_charges:
-			var point_charge = charge as Charge
-
-			# v_diff is a vector pointing from the point charge to the simulation point
-			var v_diff = (p - point_charge.position) as Vector2
-			var r_hat = v_diff.normalized() # the unit vector pointing from charge to simulation point
-			var distance = v_diff.length() # distance between the charge and the simulation point
-			var Q = point_charge.Q
-
-			# Calculate the magnitude of the vector we are going to display. This is straight
-			# out of Coulomb's Law, however we also reduce the mangitude here by visual_scaling_factor
-			# otherwise the mangitude of the vectors would be enormous in some cases, and we would
-			# not be able to display them in any sensible/legible manner
-			var magnitude = (1/(4 * PI * permittivity) * Q) / (visual_scaling_factor * distance * distance)
-				
-			super_position_resultant_vector += magnitude * r_hat;
-		forces.append(super_position_resultant_vector)
-
-	return forces;
 			
 func _draw():
 	
@@ -144,10 +111,21 @@ func _process(delta: float) -> void:
 
 	var simulation_charges = get_tree().get_nodes_in_group("charge_group")
 	var existing_force_vectors = get_tree().get_nodes_in_group("visual_vector")
+	
+	var nodes_in_group: Array[Node] = get_tree().get_nodes_in_group("charge_group")
+	
+	# Create a new, correctly typed array
+	var charges_array: Array[Charge]
+	for node in nodes_in_group:
+		# It's good practice to double-check the type, even though we know it should be correct
+		if node is Charge:
+			charges_array.append(node)
+	#var forcesA: Array[Vector2] = calculate_electro_static_forces(simulation_charges, simulation_points)
+	var forces: Array[Vector2] = Electrostatics.calculate_field_at_points(charges_array, simulation_points)
 
-	var forces: Array[Vector2] = calculate_electro_static_forces(simulation_charges, simulation_points)
+	#var forces: Array[Vector2] = calculate_electro_static_forces(simulation_charges, simulation_points)
 	for i in forces.size():
-		var force = forces[i]
+		var force = forces[i] / visual_scaling_factor
 		var simulation_point = simulation_points[i]
 		var from = simulation_point;
 		visual_vectors[i].from = from
@@ -192,7 +170,6 @@ func _input(event):
 		$Camera2D.position -= (event.relative / $Camera2D.zoom.x)
 
 func _on_control_panel_point_charge_created(charge: float) -> void:
-	print (charge)
 	var point_charge: Charge = PointChargeScene.instantiate()
 	point_charge.Q = charge;
 	var grid_size = $Grid.transform.get_scale();
@@ -328,40 +305,10 @@ func _get_hovered_colliders():
 	
 	return results
 func _is_vector_hovered():
-	#print('_is_vector_hovered called')
-	## N.B. Gemini created
-	## 1. Get mouse position in viewport coordinates
-	#var viewport_mouse_pos: Vector2 = get_viewport().get_mouse_position()
-#
-	## 2. Get the viewport's transform (World -> Viewport)
-	#var canvas_transform: Transform2D = get_viewport().get_canvas_transform()
-#
-	## 3. Calculate the inverse transform (Viewport -> World)
-	#var inverse_canvas_transform: Transform2D = canvas_transform.affine_inverse()
-#
-	## 4. Convert viewport mouse position to global world coordinates
-	#var global_mouse_pos: Vector2 = inverse_canvas_transform * viewport_mouse_pos
-	## Note: If this script is on a CanvasItem (like Node2D, Control, etc.),
-	## you could potentially use get_global_mouse_position(), but the transform
-	## method above is more universally applicable regardless of where this
-	## function resides.
-#
-	## 5. Get the direct space state
-	#var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
-#
-	## 6. Set up the query using GLOBAL coordinates
-	#var query := PhysicsPointQueryParameters2D.new()
-	#query.position = global_mouse_pos # Use the CORRECT coordinate space!
-	#query.collide_with_areas = true
-	#query.collide_with_bodies = true
-	## query.collision_mask = YOUR_VECTOR_LAYER_MASK # Optional: Filter by physics layer
-#
-	## 7. Perform the query
-	#var results: Array[Dictionary] = space_state.intersect_point(query)
+
 	var results = _get_hovered_colliders()
 	# 8. Check results
 	for result in results:
-		print(result)
 		var collider_node = result.get("collider")
 
 		# IMPORTANT: The collider might be the CollisionShape2D or the body node
