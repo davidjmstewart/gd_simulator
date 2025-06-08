@@ -21,7 +21,7 @@ var to: Vector2 = Vector2(200,200);
 
 var vec: Vector2 = Vector2(100,100): set = _set_vec;
 
-
+var index: int = -1
 @onready
 var VectorHead: Polygon2D = $VectorHead
 @onready

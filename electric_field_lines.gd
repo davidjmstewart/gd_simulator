@@ -17,9 +17,9 @@ var simulation_points = []
 var use_vector_clamping: bool =  false;
 var d = 0;
 var last_hovered_vector = null;
-
+var field_strengths: Array[Vector2]
 func _ready() -> void:
-
+	$FieldInfoPanel.hide()
 	# This section calculates the grid for displaying in a shader
 	var step_width_x_UV: float = 1.0/grid_resolution;
 	var grid_size = $Grid.transform.get_scale();
@@ -55,13 +55,20 @@ func charge_node_hover_state_changed(is_hovered: bool) -> void:
 		Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 
 func initialise_visual_vectors(simulation_points: Array):
-	for p in simulation_points:
+	for i in range(simulation_points.size()):
+		var p = simulation_points[i]
+
 		var visual_vec: VisualVector = VisualVectorScene.instantiate()
 		visual_vec.add_to_group("visual_vector")
+
+		visual_vec.index = i
+
 		visual_vec.vector_hovered.connect(_on_vector_hovered)
 		visual_vec.vector_exited.connect(_on_vector_exited)
 
 		add_child(visual_vec)
+			
+			
 			
 func _draw():
 	
@@ -76,9 +83,8 @@ func _draw():
 			
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	#print(is_node_type_hovered())
-	print(_is_vector_hovered())
-	
+
+
 	var visual_vectors: Array = get_tree().get_nodes_in_group("visual_vector")
 	# Do some basic sanity checking to make sure that each node in this group is
 	# actually a visual_vector
@@ -122,6 +128,7 @@ func _process(delta: float) -> void:
 			charges_array.append(node)
 	#var forcesA: Array[Vector2] = calculate_electro_static_forces(simulation_charges, simulation_points)
 	var forces: Array[Vector2] = Electrostatics.calculate_field_at_points(charges_array, simulation_points)
+	field_strengths = forces
 
 	#var forces: Array[Vector2] = calculate_electro_static_forces(simulation_charges, simulation_points)
 	for i in forces.size():
@@ -191,14 +198,28 @@ func _on_use_max_vector_size_toggled(toggled_on: bool) -> void:
 	use_vector_clamping = toggled_on;
 
 func _on_vector_hovered(vec: VisualVector):
-	print('vector hovered!')
-	print(vec.vec)
-	_is_vector_hovered()
+	var vector_index = vec.index
+	# 1. A safety check to make sure the index is valid.
+	if vector_index < 0 or vector_index >= field_strengths.size():
+		print_debug("Received an invalid vector index: %d" % vector_index)
+		return
 
+	# 2. Use the index to look up the TRUE data from your source-of-truth array.
+	#    'true_field_vector' is the pure, unscaled Vector2 data.
+	var true_field_vector = field_strengths[vector_index]
+
+	# 3. Tell the info panel to show itself and display this pure data.
+	#    The panel itself will handle calculating the magnitude and setting the label text.
+	$FieldInfoPanel.show_info(true_field_vector)
+
+	# 4. Handle other hover effects.
 	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
-	if (vec):
-		last_hovered_vector = vec
-		#
+	
+	# If you still need to track the last hovered node itself:
+	# Note: This is less efficient than just using the index.
+	var visual_vectors = get_tree().get_nodes_in_group("visual_vector")
+	if vector_index < visual_vectors.size():
+		last_hovered_vector = visual_vectors[vector_index]
 func is_node_type_hovered(target_identifier = "VisualVector") -> bool: # Defaulting to string name
 	# --- Input Validation ---
 	if target_identifier == null:
