@@ -1,0 +1,153 @@
+[gd_scene load_steps=3 format=3 uid="uid://b5w5c5w5d5g5"]
+
+[ext_resource type="Script" path="res://settings_menu.gd" id="1_fpl8t"]
+
+[sub_resource type="Animation" id="Animation_s1g1g"]
+resource_name = "open"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:custom_minimum_size")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(50, 200), Vector2(250, 200)]
+}
+tracks/1/type = "method"
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["open"],
+"method": "_on_animation_player_animation_started"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_c1g1g"]
+resource_name = "close"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:custom_minimum_size")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(250, 200), Vector2(50, 200)]
+}
+tracks/1/type = "method"
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.2),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["close"],
+"method": "_on_animation_player_animation_finished"
+}]
+}
+
+[node name="SettingsMenu" type="PanelContainer"]
+offset_right = 50.0
+offset_bottom = 200.0
+script = ExtResource("1_fpl8t")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ToggleButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = ">"
+toggle_mode = true
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="DistanceUnitsContainer" type="VBoxContainer" parent="HBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DistanceUnitsLabel" type="Label" parent="HBoxContainer/MarginContainer/VBoxContainer/DistanceUnitsContainer"]
+layout_mode = 2
+text = "Distance Units"
+
+[node name="DistanceUnitsInput" type="LineEdit" parent="HBoxContainer/MarginContainer/VBoxContainer/DistanceUnitsContainer"]
+layout_mode = 2
+placeholder_text = "e.g., meters"
+
+[node name="ValidationLabel" type="Label" parent="HBoxContainer/MarginContainer/VBoxContainer/DistanceUnitsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+text = "Invalid units!"
+
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="VisualScalingContainer" type="VBoxContainer" parent="HBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="VisualScalingLabel" type="Label" parent="HBoxContainer/MarginContainer/VBoxContainer/VisualScalingContainer"]
+layout_mode = 2
+text = "Visual Scaling"
+
+[node name="VisualScalingSlider" type="HSlider" parent="HBoxContainer/MarginContainer/VBoxContainer/VisualScalingContainer"]
+layout_mode = 2
+min_value = 1000
+max_value = 200000
+value = 100000
+
+[node name="HSeparator2" type="HSeparator" parent="HBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="VectorClampContainer" type="VBoxContainer" parent="HBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="VectorClampLabel" type="Label" parent="HBoxContainer/MarginContainer/VBoxContainer/VectorClampContainer"]
+layout_mode = 2
+text = "Vector Clamp"
+
+[node name="VectorClampSlider" type="HSlider" parent="HBoxContainer/MarginContainer/VBoxContainer/VectorClampContainer"]
+layout_mode = 2
+max_value = 50
+value = 10
+
+[node name="UseMaxVectorSize" type="CheckBox" parent="HBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Use Max Vector Size"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_s1g1g")
+}
+anims/open = SubResource("Animation_s1g1g")
+anims/close = SubResource("Animation_c1g1g")
+
+[connection signal="toggled" from="HBoxContainer/ToggleButton" to="." method="_on_toggle_button_toggled"]
+[connection signal="text_submitted" from="HBoxContainer/MarginContainer/VBoxContainer/DistanceUnitsContainer/DistanceUnitsInput" to="." method="_on_distance_units_input_text_submitted"]
+[connection signal="value_changed" from="HBoxContainer/MarginContainer/VBoxContainer/VisualScalingContainer/VisualScalingSlider" to="." method="_on_visual_scaling_slider_value_changed"]
+[connection signal="value_changed" from="HBoxContainer/MarginContainer/VBoxContainer/VectorClampContainer/VectorClampSlider" to="." method="_on_vector_clamp_slider_value_changed"]
+[connection signal="toggled" from="HBoxContainer/MarginContainer/VBoxContainer/UseMaxVectorSize" to="." method="_on_use_max_vector_size_toggled"]
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
+[connection signal="animation_started" from="AnimationPlayer" to="." method="_on_animation_player_animation_started"]

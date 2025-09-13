@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3 uid="uid://84hjeopiwr3b"]
+
+[ext_resource type="PackedScene" uid="uid://wsbvg5k8u0q1" path="res://3d_elctrostatic_fields/VisVec3.tscn" id="1_8j8af"]
+[ext_resource type="PackedScene" uid="uid://cjawleqvg4vtj" path="res://visual_vector.tscn" id="1_u6ykm"]
+[ext_resource type="Script" uid="uid://bt2og4hso7rlo" path="res://godot-free-look-camera-132062011edfce9399a489756064cfea880dad4c/free_look_camera.gd" id="3_xbc05"]
+[ext_resource type="Script" uid="uid://cskogiq284y4d" path="res://3d_elctrostatic_fields/3dDebugVector.gd" id="4_ho4mj"]
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_ho4mj"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="VisualVector" parent="." instance=ExtResource("1_u6ykm")]
+
+[node name="Main" parent="." instance=ExtResource("1_8j8af")]
+visible = false
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.173741, 0.441197)
+script = ExtResource("3_xbc05")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ImmediateMesh_ho4mj")
+skeleton = NodePath("../Sprite3D")
+script = ExtResource("4_ho4mj")
+origin = Vector3(1, 0, 0)
+target = Vector3(0, 1, 1)
+line_width = 0.2
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.75052, 2.00498, 0)
